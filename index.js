@@ -1,6 +1,7 @@
 const { response } = require('express')
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 
 // Morgan token function to log data from POST requests
 morgan.token('data', (request,respone) => JSON.stringify(request.body))
@@ -30,10 +31,13 @@ let persons = [
     }
   ]
 
+// MIDDLEWARE
 // Activates express's json parser
 app.use(express.json())
 // Activate "morgan" middleware, configuring with tiny + data
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
+// CORS
+app.use(cors())
 
 // return all persons
 app.get('/api/persons', (request, response) => {
