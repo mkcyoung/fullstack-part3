@@ -53,6 +53,9 @@ app.use(morgan((tokens, req, res) => {
 // CORS
 app.use(cors())
 
+//STATIC
+app.use(express.static('build'))
+
 // return all persons
 app.get('/api/persons', (request, response) => {
     response.json(persons)
