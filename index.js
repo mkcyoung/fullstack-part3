@@ -35,7 +35,21 @@ let persons = [
 // Activates express's json parser
 app.use(express.json())
 // Activate "morgan" middleware, configuring with tiny + data
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
+// app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
+// This only displays data content for post
+app.use(morgan((tokens, req, res) => {
+    let result = [ tokens.method(req,res),
+        tokens.url(req, res),
+        tokens.status(req, res),
+        tokens.res(req, res, 'content-length'), '-',
+        tokens['response-time'](req, res), 'ms'].join(' ')
+    if (tokens.method(req,res) != 'POST'){
+        return result
+    } else{
+        return  result.concat(tokens.data(req,res))
+    }
+}))
+
 // CORS
 app.use(cors())
 
@@ -107,7 +121,7 @@ app.post('/api/persons', (request, response) => {
 
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
     app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
