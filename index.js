@@ -114,9 +114,7 @@ app.post('/api/persons', (request, response) => {
         // Number needs to be big enough to make collisions unlikely
         id: getRandomId(100000) 
     }
-
     persons = persons.concat(person)
-
     response.json(persons)
 
 })
