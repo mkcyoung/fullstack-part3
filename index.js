@@ -1,4 +1,10 @@
+const { response } = require('express')
 const express = require('express')
+const morgan = require('morgan')
+
+// Morgan token function to log data from POST requests
+morgan.token('data', (request,respone) => JSON.stringify(request.body))
+
 const app = express()
 
 let persons = [
@@ -26,6 +32,8 @@ let persons = [
 
 // Activates express's json parser
 app.use(express.json())
+// Activate "morgan" middleware, configuring with tiny + data
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
 
 // return all persons
 app.get('/api/persons', (request, response) => {

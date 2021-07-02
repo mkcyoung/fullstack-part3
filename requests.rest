@@ -11,8 +11,7 @@ Content-Type: application/json
 
 {
     "name": "Greatest Ever",
-    "number": "1-800-HOTLINE",
-    "id": 5
+    "number": "1-800-HOTLINE"
 }
 
 ###
