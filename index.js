@@ -114,8 +114,10 @@ app.post('/api/persons', (request, response) => {
         // Number needs to be big enough to make collisions unlikely
         id: getRandomId(100000) 
     }
-    persons = persons.concat(person)
-    response.json(persons)
+    // I don't think this is necessary, I just need to send the 1 back
+    // Alternatively I could handle the whole thing in the backend here and remove the concat from the front end.
+    // persons = persons.concat(person) 
+    response.json(person)
 
 })
 
