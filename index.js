@@ -1,35 +1,15 @@
+require('dotenv').config()
 const { response } = require('express')
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./models/person')
+
 
 // Morgan token function to log data from POST requests
 morgan.token('data', (request,respone) => JSON.stringify(request.body))
 
 const app = express()
-
-let persons = [
-    {
-        "name": "Arto Hellas",
-        "number": "040-123456",
-        "id": 1
-    },
-    {
-        "name": "Ada Lovelace",
-        "number": "39-44-5323523",
-        "id": 2
-    },
-    {
-        "name": "Dan Abramov",
-        "number": "1-800-MY-DUDE",
-        "id": 3
-    },
-    {
-        "name": "Mary Poppendieck",
-        "number": "39-23-6423122",
-        "id": 4
-    }
-  ]
 
 // MIDDLEWARE
 // Activates express's json parser
@@ -56,9 +36,20 @@ app.use(cors())
 //STATIC
 app.use(express.static('build'))
 
+
 // return all persons
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Person.find({}).then((persons) => {
+        // persons.forEach(person =>
+        //     response.json(person))
+        if (persons) {
+            response.json(persons)
+        }
+        else{
+            response.status(404).end()
+        }
+    })
+    // response.json(persons)
 })
 
 // return info for page
@@ -70,13 +61,13 @@ app.get('/info', (request, response) => {
 
 // return individual person
 app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = persons.find(person => person.id === id)
-    if (person) {
-        response.json(person)
-    } else {
-        response.status(404).end()
-    }
+    Person.findById(request.params.id).then(person => {
+        if (person) {
+            response.json(person)
+        } else {
+            response.status(404).end()
+        }
+    })
 })
 
 // delete person
@@ -111,12 +102,18 @@ app.post('/api/persons', (request, response) => {
         })
     }
     
-    const person = {
+    // const person = {
+    //     name: body.name,
+    //     number: body.number,
+    //     // Number needs to be big enough to make collisions unlikely
+    //     id: getRandomId(100000) 
+    // }
+
+    const person = new Person({
         name: body.name,
-        number: body.number,
-        // Number needs to be big enough to make collisions unlikely
-        id: getRandomId(100000) 
-    }
+        number: body.number
+        // Not sure if I also need id field or if that is handled by mongodb?
+    })
     // I don't think this is necessary, I just need to send the 1 back
     // Alternatively I could handle the whole thing in the backend here and remove the concat from the front end.
     // persons = persons.concat(person) 
@@ -124,7 +121,13 @@ app.post('/api/persons', (request, response) => {
 
 })
 
-const PORT = process.env.PORT || 3001
+// const PORT = process.env.PORT || 3001
+//     app.listen(PORT, () => {
+//     console.log(`Server running on port ${PORT}`)
+// })
+
+// Listen for port
+const PORT = process.env.PORT
     app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
