@@ -84,6 +84,7 @@ getRandomId = (max) => Math.floor(Math.random() * max)
 // Add entry to phonebook
 app.post('/api/persons', (request, response) => {
     const body = request.body
+    console.log(body)
     
     // Error handling (TODO: make more succinct)
     if (!body.name){
@@ -96,11 +97,12 @@ app.post('/api/persons', (request, response) => {
             error: 'missing number'
         })
     }
-    else if (persons.map(person => person.name).includes(body.name)){
-        return response.status(400).json({
-            error: 'name already in phonebook'
-        })
-    }
+    // How do I check the whole database for name?
+    // else if (persons.map(person => person.name).includes(body.name)){
+    //     return response.status(400).json({
+    //         error: 'name already in phonebook'
+    //     })
+    // }
     
     // const person = {
     //     name: body.name,
@@ -117,6 +119,8 @@ app.post('/api/persons', (request, response) => {
     // I don't think this is necessary, I just need to send the 1 back
     // Alternatively I could handle the whole thing in the backend here and remove the concat from the front end.
     // persons = persons.concat(person) 
+    // Save to database ?
+    person.save()
     response.json(person)
 
 })
