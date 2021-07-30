@@ -12,6 +12,10 @@ morgan.token('data', (request,respone) => JSON.stringify(request.body))
 const app = express()
 
 // MIDDLEWARE
+
+//STATIC
+app.use(express.static('build'))
+
 // Activates express's json parser
 app.use(express.json())
 // Activate "morgan" middleware, configuring with tiny + data
@@ -33,23 +37,19 @@ app.use(morgan((tokens, req, res) => {
 // CORS
 app.use(cors())
 
-//STATIC
-app.use(express.static('build'))
-
 
 // return all persons
-app.get('/api/persons', (request, response) => {
-    Person.find({}).then((persons) => {
-        // persons.forEach(person =>
-        //     response.json(person))
-        if (persons) {
-            response.json(persons)
-        }
-        else{
-            response.status(404).end()
+app.get('/api/persons', (request, response, next) => {
+    Person.find({})
+        .then((persons) => {
+            if (persons) {
+                response.json(persons)
+            }
+            else{
+                response.status(404).end()
         }
     })
-    // response.json(persons)
+    .catch(error => next(error))
 })
 
 // return info for page
@@ -60,7 +60,7 @@ app.get('/info', (request, response) => {
 })
 
 // return individual person
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id).then(person => {
         if (person) {
             response.json(person)
@@ -68,14 +68,20 @@ app.get('/api/persons/:id', (request, response) => {
             response.status(404).end()
         }
     })
+    .catch(error => next(error))
 })
 
 // delete person
 app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    persons = persons.filter(person => person.id !== id)
+    Person.findByIdAndRemove(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
+        .catch(error => next(error))
+    // const id = Number(request.params.id)
+    // persons = persons.filter(person => person.id !== id)
 
-    response.status(204).end()
+    // response.status(204).end()
 })
 
 // helper function for generating random int for id
@@ -87,6 +93,8 @@ app.post('/api/persons', (request, response) => {
     console.log(body)
     
     // Error handling (TODO: make more succinct)
+    // Not sure how to incorporate these errors into catch, etc.
+    // Also unsure of how to read errors, like where is this object going?
     if (!body.name){
         return response.status(400).json({
             error: 'missing name'
@@ -120,10 +128,24 @@ app.post('/api/persons', (request, response) => {
     // Alternatively I could handle the whole thing in the backend here and remove the concat from the front end.
     // persons = persons.concat(person) 
     // Save to database ?
-    person.save()
-    response.json(person)
+    person
+        .save()
+        .then((savedPerson) => response.json(savedPerson))
+        .catch(error => next(error))
 
 })
+
+// Error handling etc.
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+    if (error.name === "CastError") {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+    next(error)
+}
+
+// handler of requests with result to errors
+app.use(errorHandler)
 
 // const PORT = process.env.PORT || 3001
 //     app.listen(PORT, () => {
