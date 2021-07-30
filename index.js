@@ -72,7 +72,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 })
 
 // delete person
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndRemove(request.params.id)
         .then(result => {
             response.status(204).end()
@@ -133,6 +133,22 @@ app.post('/api/persons', (request, response) => {
         .then((savedPerson) => response.json(savedPerson))
         .catch(error => next(error))
 
+})
+
+// adjusting number if name is already in the phonebook
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+
+    Person.findByIdAndUpdate(request.params.id, person, {new: true})
+        .then(updatedPerson => {
+            response.json(updatedPerson)
+        })
+        .catch(error => next(error))
 })
 
 // Error handling etc.
