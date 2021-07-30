@@ -54,9 +54,13 @@ app.get('/api/persons', (request, response, next) => {
 
 // return info for page
 app.get('/info', (request, response) => {
-    let head = `<p>Phonebook has info for ${persons.length} people</p>`
-    let info = head.concat(`<p> ${new Date()} </p>`)
-    response.send(info)
+    Person.find({})
+        .then((persons) => {
+            let head = `<p>Phonebook has info for ${persons.length} people</p>`
+            let info = head.concat(`<p> ${new Date()} </p>`)
+            response.send(info)
+        })
+    
 })
 
 // return individual person
