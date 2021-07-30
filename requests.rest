@@ -45,3 +45,12 @@ GET http://localhost:3001/api/persons/malFormattedId
 
 ###
 PUT http://localhost:3001/api/persons/60e3aa21b85be959f90864ec
+
+###
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "baby",
+    "number": "1-800-LOVE"
+}

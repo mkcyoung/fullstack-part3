@@ -92,7 +92,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 getRandomId = (max) => Math.floor(Math.random() * max)
 
 // Add entry to phonebook
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
     console.log(body)
     
@@ -157,9 +157,11 @@ app.put('/api/persons/:id', (request, response, next) => {
 
 // Error handling etc.
 const errorHandler = (error, request, response, next) => {
-    console.error(error.message)
+    console.error("in error handling",error.message)
     if (error.name === "CastError") {
         return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === "ValidationError") {
+        return response.status(400).json({ error: error.message })
     }
     next(error)
 }
