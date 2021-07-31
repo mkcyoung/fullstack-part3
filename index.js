@@ -47,9 +47,9 @@ app.get('/api/persons', (request, response, next) => {
             }
             else{
                 response.status(404).end()
-        }
-    })
-    .catch(error => next(error))
+            }
+        })
+        .catch(error => next(error))
 })
 
 // return info for page
@@ -60,7 +60,7 @@ app.get('/info', (request, response) => {
             let info = head.concat(`<p> ${new Date()} </p>`)
             response.send(info)
         })
-    
+
 })
 
 // return individual person
@@ -72,7 +72,7 @@ app.get('/api/persons/:id', (request, response, next) => {
             response.status(404).end()
         }
     })
-    .catch(error => next(error))
+        .catch(error => next(error))
 })
 
 // delete person
@@ -95,7 +95,7 @@ getRandomId = (max) => Math.floor(Math.random() * max)
 app.post('/api/persons', (request, response, next) => {
     const body = request.body
     console.log(body)
-    
+
     // Error handling (TODO: make more succinct)
     // Not sure how to incorporate these errors into catch, etc.
     // Also unsure of how to read errors, like where is this object going?
@@ -115,12 +115,12 @@ app.post('/api/persons', (request, response, next) => {
     //         error: 'name already in phonebook'
     //     })
     // }
-    
+
     // const person = {
     //     name: body.name,
     //     number: body.number,
     //     // Number needs to be big enough to make collisions unlikely
-    //     id: getRandomId(100000) 
+    //     id: getRandomId(100000)
     // }
 
     const person = new Person({
@@ -130,7 +130,7 @@ app.post('/api/persons', (request, response, next) => {
     })
     // I don't think this is necessary, I just need to send the 1 back
     // Alternatively I could handle the whole thing in the backend here and remove the concat from the front end.
-    // persons = persons.concat(person) 
+    // persons = persons.concat(person)
     // Save to database ?
     person
         .save()
@@ -149,7 +149,7 @@ app.put('/api/persons/:id', (request, response, next) => {
         number: body.number
     }
 
-    Person.findByIdAndUpdate(request.params.id, person, {new: true, runValidators: true, context: 'query'})
+    Person.findByIdAndUpdate(request.params.id, person, { new: true, runValidators: true, context: 'query' })
         .then(updatedPerson => {
             response.json(updatedPerson)
         })
@@ -158,9 +158,9 @@ app.put('/api/persons/:id', (request, response, next) => {
 
 // Error handling etc.
 const errorHandler = (error, request, response, next) => {
-    if (error.name === "CastError") {
+    if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
-    } else if (error.name === "ValidationError") {
+    } else if (error.name === 'ValidationError') {
         return response.status(400).send({ error: error.message })
     }
     next(error)
@@ -176,6 +176,6 @@ app.use(errorHandler)
 
 // Listen for port
 const PORT = process.env.PORT
-    app.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
